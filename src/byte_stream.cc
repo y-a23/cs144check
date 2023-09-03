@@ -59,7 +59,7 @@ string_view Reader::peek() const
 bool Reader::is_finished() const
 {
   // Your code here.
-  return {is_close&&bytebuffer.size()==0};
+  return {is_close&&(bytebuffer.size()==0)};
 }
 
 bool Reader::has_error() const
