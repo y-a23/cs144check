@@ -8,7 +8,8 @@ class TCPReceiver
 {
 
 private:
-  
+  bool receive_syn{false};
+  Wrap32 SYN_seqno{0};
 public:
   /*
    * The TCPReceiver receives TCPSenderMessages, inserting their payload into the Reassembler
