@@ -6,6 +6,9 @@
 
 class TCPReceiver
 {
+
+private:
+  
 public:
   /*
    * The TCPReceiver receives TCPSenderMessages, inserting their payload into the Reassembler
