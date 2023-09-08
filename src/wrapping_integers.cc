@@ -44,7 +44,10 @@ uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
   uint64_t ans3=((num+1)<<32) + zero2raw_distance;
   uint64_t distance3 = ans3 - checkpoint;
 
-  uint64_t mindis = min(distance1, min(distance2, distance3));
+  uint64_t mindis ;//= min(distance1, min(distance2, distance3));
+  mindis = distance2>distance3? distance3:distance2;
+  mindis = mindis>distance1? distance1:mindis;
+  
   if(mindis==distance1)return ans1;
   else if(mindis==distance2)return ans2;
   else  return ans3;
