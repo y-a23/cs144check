@@ -13,7 +13,7 @@ class TCPSender
   bool fin_send_{false};
 
   uint64_t count_outstand_{0};
-  uint16_t windowsize_ {1};
+  uint16_t windowsize_ {1};//这里用1初始化，用0有一个测试样例会出错，tick超时的时候有一个if进不去
   uint64_t ab_ackno_{0};
   std::queue<TCPSenderMessage> buf_ready_send_{};//用队列装msg，删除插入都比较方便
   //uint64_t num_ready_send_{0};

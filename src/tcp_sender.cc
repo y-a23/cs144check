@@ -107,7 +107,8 @@ void TCPSender::push( Reader& outbound_stream )
       }
 
       //if(msg.FIN || outbound_stream.bytes_buffered()==0)break;
-      //我认为不加这个break也能行，但是最后测试的时候发现序列号会有问题
+      //9.14我认为不加这个break也能行，但是最后测试的时候发现序列号会有问题
+      //9.15发现是忘了给send_fin赋值才出错的
     }
     return;
   }
