@@ -60,12 +60,13 @@ void TCPSender::push( Reader& outbound_stream )
   //   return;
   // }
   if(fin_send_==true)return;
-  if(buf_send_not_ack_.empty()==false)
-  {
-    if(syn_send_==true&&buf_send_not_ack_.front().SYN==true)return;
-    //if(syn_send_==true)return;
-  }
+  // if(buf_send_not_ack_.empty()==false)
+  // {
+  //   if(syn_send_==true&&buf_send_not_ack_.front().SYN==true)return;
+  //   //if(syn_send_==true)return;
+  // }
   //syn发送但是还没确认
+  //9.15发现没有这个判断也可以通过测试
 
   uint temp_window_size = windowsize_==0? 1:windowsize_;
   if(temp_window_size>0)
@@ -108,7 +109,7 @@ void TCPSender::push( Reader& outbound_stream )
 
       //if(msg.FIN || outbound_stream.bytes_buffered()==0)break;
       //9.14我认为不加这个break也能行，但是最后测试的时候发现序列号会有问题
-      //9.15发现是忘了给send_fin赋值才出错的
+      //9.15发现是忘了给fin_send_赋值才出错的
     }
     return;
   }
