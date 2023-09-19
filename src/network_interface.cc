@@ -28,8 +28,10 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
   uint32_t target_ip = next_hop.ipv4_numeric();
   //uint32_t source_address = dgram.header.src;
   //uint32_t destination_address = dgram.header.dst;
+  //发送到next_hop, 而不是dgram的dst
   auto it = map_ip2mac_.find(target_ip);
-  //目标以太网地址已知，打包dgram发送
+
+  //nexthop的以太网地址已知，封装dgram发送
   if(it!=map_ip2mac_.end())
   {
     EthernetFrame send_frame
@@ -39,7 +41,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
     return;
   }
 
-  //未知，如果没发过arp就发request arp，把dgram缓存起来
+  //nexthop的以太网地址未知，如果没发过arp就发request arp，把dgram缓存起来
   if(map_arp_time_.find(target_ip)==map_arp_time_.end())
   {
     ARPMessage arp_send;
@@ -49,7 +51,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
     arp_send.target_ip_address = target_ip;
     EthernetFrame send_frame{{ETHERNET_BROADCAST, ethernet_address_, EthernetHeader::TYPE_ARP}, serialize(arp_send)};
     send_frame_.push(send_frame);
-    map_arp_time_.insert(make_pair(target_ip, 0));
+    map_arp_time_.insert(make_pair(target_ip, 0));//发完arp之后加入到map里面记录下来
   }
   //缓存dgram
   auto it_store_dgram = store_dgram_.find(target_ip);
@@ -75,7 +77,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
     ARPMessage rec_arp;
     parse(rec_arp, frame.payload);
     map_ip2mac_.insert(make_pair(rec_arp.sender_ip_address, make_pair(rec_arp.sender_ethernet_address, 0)));
-    //收到的是request
+    //收到的是request，如果request的是自己的以太网地址，就发送一个reply的arpmessage，发送给request方
     if(rec_arp.opcode==ARPMessage::OPCODE_REQUEST)
     {
       if(rec_arp.target_ip_address == ip_address_.ipv4_numeric())
@@ -95,7 +97,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
       else return{};
     }
 
-    //收到arp之后检查一下有没有可以发送的dgram
+    //收到arp之后，无论arp是reply还是request都检查一下有没有可以发送的dgram
     auto it = store_dgram_.find(rec_arp.sender_ip_address);
     if(it!=store_dgram_.end())
     {
@@ -109,6 +111,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame( const EthernetFrame& fr
       if(it->second.empty()) store_dgram_.erase(it);
     }
   }
+
   //frame携带的是internetdatagram
   else if(frame.header.type==EthernetHeader::TYPE_IPv4)
   {
