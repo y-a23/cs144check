@@ -41,6 +41,15 @@ private:
   // IP (known as Internet-layer or network-layer) address of the interface
   Address ip_address_;
 
+  std::queue<EthernetFrame> send_frame_{};
+
+  std::unordered_map<uint32_t, std::queue<InternetDatagram>> store_dgram_{};
+  //std::queue<std::pair<InternetDatagram, Address>> store_dgram_{};
+  //这里key值不能选Address，它没有拷贝构造函数，=重载
+  std::unordered_map<uint32_t, std::pair<EthernetAddress, size_t>> map_ip2mac_{};
+  std::unordered_map<uint32_t,size_t> map_arp_time_{};
+
+
 public:
   // Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer)
   // addresses
