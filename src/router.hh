@@ -50,11 +50,39 @@ public:
 
 // A router that has multiple network interfaces and
 // performs longest-prefix-match routing between them.
+// class Router
+// {
+//   // The router's collection of network interfaces
+//   std::vector<AsyncNetworkInterface> interfaces_ {};
+
+//   struct Route_entry//route_entry_
+//   {
+//     uint32_t route_prefix{};
+//     uint8_t prefix_length{};
+//     std::optional<Address> next_hop;
+//     size_t interface_num{};
+//   };
+//   //static typedef struct route_entry_ Route_entry;
+//   std::vector<Route_entry> route_table_{};
 class Router
 {
   // The router's collection of network interfaces
   std::vector<AsyncNetworkInterface> interfaces_ {};
+  struct Route_entry
+  {
+    uint32_t route_prefix {};
+    uint8_t prefix_length {};
+    std::optional<Address> next_hop;
+    size_t interface_num {};
+  };
 
+  
+
+  std::vector<Route_entry> route_table_ {};
+
+  //std::vector<Route_entry>::iterator longest_prefix_match_( uint32_t dst_ip );
+
+  //static int match_length_( uint32_t src_ip, uint32_t tgt_ip, uint8_t tgt_len );
 public:
   // Add an interface to the router
   // interface: an already-constructed network interface
@@ -81,4 +109,9 @@ public:
   // route with the longest prefix_length that matches the datagram's
   // destination address.
   void route();
+
+  std::vector<Route_entry>::iterator longest_prefix_match_( uint32_t dst_ip );
+  int match_length_( uint32_t src_ip, uint32_t tgt_ip, uint8_t tgt_len );
+  // std::vector<Route_entry>::iterator longest_prefix_match_( uint32_t dst_ip );
+  // int match_length_( uint32_t src_ip, uint32_t tgt_ip, uint8_t tgt_len );
 };
